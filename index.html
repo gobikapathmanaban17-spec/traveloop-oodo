@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Traveloop Pro – Ultimate Data Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --bg: #08080f; --surface: #10101e; --surface2: #18182e;
+  --purple: #7c3aed; --purple-light: #a855f7; --text: #f4f0ff; 
+  --muted: #8b80a8; --border: rgba(124,58,237,0.2); --accent: #e879f9; --success: #4ade80; --error: #ff4d4d;
+}
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Outfit',sans-serif; }
+body { background:var(--bg); color:var(--text); overflow-x:hidden; }
+
+/* NAVIGATION */
+nav { display: none; background: rgba(8,8,15,0.98); backdrop-filter: blur(15px); padding: 15px; border-bottom: 1px solid var(--border); position: sticky; top:0; z-index:1000; }
+.nav-menu { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; }
+.nav-menu::-webkit-scrollbar { display: none; }
+.nav-menu button { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); padding: 10px 18px; border-radius: 25px; cursor: pointer; white-space: nowrap; font-size: 0.85rem; border: 1px solid var(--border); }
+.nav-menu button.active { background: var(--purple); color: #fff; border-color: var(--purple-light); }
+
+/* PAGES */
+.page { display: none; padding: 20px; animation: fadeIn 0.3s ease; max-width: 1200px; margin: 0 auto; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity:0; transform: translateY(10px); } to { opacity:1; } }
+
+/* UI ELEMENTS */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 20px; margin-top: 15px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
+.btn { background: var(--purple); color:#fff; border:none; padding:12px; border-radius:10px; font-weight:600; cursor:pointer; width: 100%; transition: 0.2s; }
+input, textarea { width: 100%; padding: 12px; margin: 8px 0; background: var(--surface2); border: 1px solid var(--border); color: #fff; border-radius: 10px; }
+
+/* TABLE */
+.table-container { overflow-x: auto; margin-top: 15px; }
+table { width: 100%; border-collapse: collapse; min-width: 600px; }
+th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+th { color: var(--purple-light); text-transform: uppercase; letter-spacing: 1px; }
+
+/* SOCIAL ICONS */
+.share-box { display: flex; justify-content: center; gap: 30px; margin: 30px 0; }
+.share-item { text-align: center; cursor: pointer; transition: 0.3s; }
+.share-item i { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+.fa-whatsapp { color: #25D366; }
+.fa-instagram { color: #E4405F; }
+.fa-facebook-messenger { color: #0084FF; }
+.share-item:hover { transform: scale(1.1); }
+
+.profile-pic { width: 100px; height: 100px; border-radius: 50%; background: var(--purple); margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 3px solid var(--purple-light); }
+</style>
+</head>
+<body>
+
+<nav id="main-nav">
+  <div class="nav-menu">
+    <button onclick="showPage('dashboard')" id="btn-dashboard" class="active">🏠 Home</button>
+    <button onclick="showPage('search')" id="btn-search">🔍 Find Trip</button>
+    <button onclick="showPage('itinerary')" id="btn-itinerary">📅 26-Day Plan</button>
+    <button onclick="showPage('flights')" id="btn-flights">✈️ Flights</button>
+    <button onclick="showPage('hotels')" id="btn-hotels">🏨 Hotels</button>
+    <button onclick="showPage('history')" id="btn-history">🗺️ History</button>
+    <button onclick="showPage('profile')" id="btn-profile">👤 Profile</button>
+    <button onclick="showPage('share')" id="btn-share">🔗 Share</button>
+    <button onclick="showPage('settings')" id="btn-settings">⚙️ Settings</button>
+  </div>
+</nav>
+
+<div class="page active" id="page-login">
+  <div style="max-width:400px; margin: 100px auto; text-align:center;">
+    <h1 style="font-family:'Cormorant Garamond'; font-size:3.5rem;">Travel<span>oop</span></h1>
+    <div class="card">
+      <input type="text" id="user-input" placeholder="Enter Admin Name">
+      <button class="btn" onclick="doLogin()">Login & Sync Data</button>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-search">
+  <h2>Plan New Trip</h2>
+  <div class="card">
+    <input type="text" id="src-city" placeholder="From (Source)">
+    <input type="text" id="dest-city" placeholder="To (Destination)">
+    <input type="number" id="trip-days" placeholder="Number of Days (e.g. 26)">
+    <button class="btn" onclick="searchTrip()">Generate Full Plan</button>
+  </div>
+</div>
+
+<div class="page" id="page-dashboard">
+  <h2>Welcome, <span id="dash-user">Guest</span>!</h2>
+  <div class="grid">
+    <div class="card"><h3>Active Route</h3><p id="active-route" style="color:var(--success)">No active trip</p></div>
+    <div class="card"><h3>Total Trips</h3><p>14 Completed</p></div>
+  </div>
+</div>
+
+<div class="page" id="page-itinerary">
+  <h2>Detailed Day-wise Itinerary</h2>
+  <div class="table-container card">
+    <table>
+      <thead><tr><th>Day</th><th>Schedule</th><th>Activity</th></tr></thead>
+      <tbody id="itin-table-body">
+        <tr><td colspan="3" style="text-align:center;">Search a destination to see the plan</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="page" id="page-flights">
+  <h2>Flight Results</h2>
+  <div id="flight-list" class="grid"></div>
+</div>
+
+<div class="page" id="page-hotels">
+  <h2>Hotel Results</h2>
+  <div id="hotel-list" class="grid"></div>
+</div>
+
+<div class="page" id="page-history">
+  <h2>Previous Trips History (Past 10+)</h2>
+  <div id="history-list" class="grid"></div>
+</div>
+
+<div class="page" id="page-profile">
+  <h2>Personal Profile</h2>
+  <div class="card" style="max-width:500px; margin: 0 auto;">
+    <div class="profile-pic"><i class="fa fa-user"></i></div>
+    <label>Full Name</label>
+    <input type="text" id="p-name" value="Admin User">
+    <label>Email Address</label>
+    <input type="email" id="p-email" value="admin@traveloop.com">
+    <label>Phone Number</label>
+    <input type="text" id="p-phone" value="+91 98765 43210">
+    <label>Home Address</label>
+    <textarea id="p-addr">123, Travel Lane, Chennai, Tamil Nadu, India.</textarea>
+    <button class="btn" onclick="alert('Profile Updated Successfully!')">Save Details</button>
+  </div>
+</div>
+
+<div class="page" id="page-share">
+  <div class="card" style="text-align:center;">
+    <h2>Share Your Journey</h2>
+    <p style="color:var(--muted)">Let your friends know about your trip!</p>
+    <div class="share-box">
+      <div class="share-item" onclick="window.open('https://wa.me/')"><i class="fab fa-whatsapp"></i><span>WhatsApp</span></div>
+      <div class="share-item" onclick="window.open('https://instagram.com/')"><i class="fab fa-instagram"></i><span>Instagram</span></div>
+      <div class="share-item" onclick="window.open('https://www.messenger.com/')"><i class="fab fa-facebook-messenger"></i><span>Messenger</span></div>
+    </div>
+    <button class="btn" style="max-width:200px; margin:0 auto;">Copy Trip Link</button>
+  </div>
+</div>
+
+<div class="page" id="page-settings">
+  <h2>Settings & Support</h2>
+  <div class="card">
+    <div style="padding:15px; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa fa-question-circle"></i> Help Center</div>
+    <div style="padding:15px; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa fa-lock"></i> Privacy Policy</div>
+    <div style="padding:15px; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa fa-bell"></i> Notifications</div>
+    <div style="padding:15px; color:var(--error); cursor:pointer;" onclick="location.reload()"><i class="fa fa-sign-out-alt"></i> Logout</div>
+  </div>
+</div>
+
+<script>
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('main-nav').style.display = (name === 'login') ? 'none' : 'block';
+  document.querySelectorAll('.nav-menu button').forEach(b => b.classList.remove('active'));
+  if(document.getElementById('btn-' + name)) document.getElementById('btn-' + name).classList.add('active');
+}
+
+function doLogin() {
+  const user = document.getElementById('user-input').value || "Admin";
+  document.getElementById('dash-user').innerText = user;
+  document.getElementById('p-name').value = user;
+  showPage('dashboard');
+  loadHistory();
+}
+
+function searchTrip() {
+  const from = document.getElementById('src-city').value;
+  const to = document.getElementById('dest-city').value;
+  const days = parseInt(document.getElementById('trip-days').value) || 26;
+
+  if(!from || !to) { alert("Enter From and To!"); return; }
+
+  document.getElementById('active-route').innerText = `${from} to ${to}`;
+  
+  // 1. Generate Itinerary
+  const itinBody = document.getElementById('itin-table-body');
+  itinBody.innerHTML = "";
+  for(let i=1; i<=days; i++) {
+    itinBody.innerHTML += `<tr><td>Day ${i}</td><td>Explore ${to} Hub ${i}</td><td>Sightseeing and Cultural Tour</td></tr>`;
+  }
+
+  // 2. Generate Flights (10+)
+  const fList = document.getElementById('flight-list');
+  fList.innerHTML = "";
+  const airlines = ["Qatar", "Emirates", "Air India", "IndiGo", "Singapore", "Etihad", "Lufthansa", "British", "Thai Air", "Turkish", "Swiss"];
+  airlines.forEach(a => {
+    fList.innerHTML += `<div class="card"><h4>${a} Airways</h4><p>Non-Stop</p><p class="price" style="color:var(--success)">₹${Math.floor(Math.random()*50000 + 20000)}</p></div>`;
+  });
+
+  // 3. Generate Hotels (10+)
+  const hList = document.getElementById('hotel-list');
+  hList.innerHTML = "";
+  const hotels = ["Grand Palace", "Hilton", "Marriott", "Ritz", "Hyatt", "Sheraton", "ITC Grand", "Novotel", "Radisson", "Taj Luxe", "Ibis"];
+  hotels.forEach(h => {
+    hList.innerHTML += `<div class="card"><h4>${h} ${to}</h4><p>Luxury Stay</p><p style="color:var(--accent)">4.5 ⭐</p></div>`;
+  });
+
+  showPage('itinerary');
+}
+
+function loadHistory() {
+  const hList = document.getElementById('history-list');
+  hList.innerHTML = "";
+  for(let i=1; i<=10; i++) {
+    hList.innerHTML += `
+      <div class="card">
+        <h4 style="color:var(--purple-light)">Trip #${i}: Dubai - Singapore</h4>
+        <p style="font-size:0.8rem;">Date: Oct 202${i}</p>
+        <hr style="border:0.1px solid var(--border); margin:10px 0;">
+        <p>✈️ IndiGo 6E-11</p>
+        <p>🏨 Marina Bay Sands</p>
+      </div>`;
+  }
+}
+</script>
+
+</body>
+</html>
